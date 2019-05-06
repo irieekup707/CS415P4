@@ -30,16 +30,6 @@ int knapsack(int weight[], int val[],int cap, int n)
      int i, j;
     int k[n+1][cap+1];
     
-    
-    for(i = 0; i <= n; i++)
-    {
-        k[i][0] = 0;
-    }
-    for(j = 0; j <= n; j++)
-    {
-        k[0][j] = 0;
-    }
-     
     for(i=0; i<= n;i++)
     {
         for(j = 0; j <= cap; j++)
