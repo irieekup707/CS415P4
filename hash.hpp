@@ -9,25 +9,31 @@
 #ifndef hash_hpp
 #define hash_hpp
 
-#include <stdio.h>
+#include <iostream>
 #include <list>
 #include <tuple>
 #include <vector>
+#include <math.h>
+#include <algorithm>
 
 
 
 class hash
 {
-//    hash();
+public:
+    hash(int n, int cap);
     
     void insert(int i, int j, int val);
     
     bool contains(int i, int j);
     
-private:
+//private:
     std::vector< std::list<std::tuple<int,int,int> > > table;
     
     int h_func(int i, int j);
+    
+    int n;
+    int cap;
 };
 
 #endif /* hash_hpp */

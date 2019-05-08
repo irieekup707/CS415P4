@@ -10,9 +10,17 @@
 #include <vector>
 #include <algorithm>
 #include "time.h"
+#include "hash.hpp"
 
 int knapsack(int weight[], int val[],int cap, int n);
 int main(int argc, const char * argv[]) {
+    
+    int three = 9;
+    int zero = 0;
+    
+    hash test(three, zero);
+    test.h_func(9, 0);
+    
     int n = 4;
     
     int weight[] = {0,2,1,3,2};
