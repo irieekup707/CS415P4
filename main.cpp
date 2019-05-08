@@ -13,34 +13,34 @@
 #include "hash.hpp"
 
 int knapsack(int weight[], int val[],int cap, int n);
-int knapsackMem(const int weight[], const int val[], const int& cap, const  int& n);
-int knapsackMemHelper(int weight[], const int val[], const int& cap, const int& n, hash& table);
+int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
+int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
 
 int main(int argc, const char * argv[]) {
     
-    int k = 23;
-    int N = 10;
-    int cap = 16;
+//    int k = 23;
+//    int N = 10;
+//    int cap = 16;
+//
+//    int i = 3;
+//    int j = 9;
     
-    int i = 3;
-    int j = 9;
-    
-    hash test(k, N, cap);
+//    hash test(k, N, cap);
 //    std::cout << "index: " << test.h_func(i, j) << std::endl;
     
-    int n = 4;
+    int n = 5;
     
     int weight[] = {0,2,1,3,2};
     
-    int val[] = {0,12, 10, 20, 15};
+    int val[] = {0, 12, 10, 20, 15};
     
     int capacity = 5;
     
-    int res = knapsack(weight, val, capacity, n);
+//    int res = knapsack(weight, val, capacity, n);
     
-    int memRes = knapsackMem(weight, val, cap, n);
+    int memRes = knapsackMem(weight, val, capacity, n);
     
-    std::cout << "result is : " << res << std::endl;
+//    std::cout << "result is : " << res << std::endl;
     
     std::cout << "mem result is : " << memRes << std::endl;
     
@@ -134,45 +134,54 @@ int knapsack(int weight[], int val[],int cap, int n)
     return k[n][cap ];
 }
 
-int knapsackMem(int weight[], const int val[], const int& cap, const int& n)
+int knapsackMem(const int weight[], const int val[], const int& cap, const int& n)
 {
     int k = 23;
     hash table(k , n, cap);
     for (int i = 0; i <= n; i++)
     {
-        table.insert(i, 0, -1);
+        table.insert(i, 0, 0);
     }
     
     for (int j = 1; j <= cap; j++)
     {
-        table.insert(0, j, -1);
+        table.insert(0, j, 0);
     }
     
     return knapsackMemHelper(weight, val, cap, n, table);
 }
 
-int knapsackMemHelper(int weight[], const int val[], const int& cap, const int& n, hash& table)
+int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table)
 {
     int i, j;
     int value;
-    for(j = 0; j <= cap; j++)
+    for(j = 1; j <= cap; j++)
     {
-        for(i=0; i<= n; i++)
+        for(i=1; i<= n; i++)
         {
             if(table.contains(i, j) < 0)
             {
                 if(j < weight[i])
                 {
-                    value = knapsackMemHelper(weight, val, cap, n, table);
+                    value = table.contains(i - 1, j);
+                    assert(value >= 0);
                 }
                 else
                 {
-                    value = std::max(knapsackMemHelper(weight, val, j, i-1, table), val[i] + knapsackMemHelper(weight, val, j - weight[i], i-1, table));
+                    auto first = table.contains(i - 1, j);
+                    if (first == -1) { first = knapsackMemHelper(weight, val, j, i - 1, table); }
+                    
+                    auto second = table.contains(i - 1,  j - weight[i]);
+                    if (second == -1) { second = knapsackMemHelper(weight, val, j - weight[i], i - 1, table); }
+                    
+                    value = std::max(first, val[i] + second);
                 }
                 table.insert(i, j, value);
+                table.printTable();
             }
         }
     }
+//    std::cout << "i: " << i << ", j: " << j << std::endl;
     
     return table.contains(i, j);
 }

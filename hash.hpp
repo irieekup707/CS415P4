@@ -32,6 +32,8 @@ public:
     
     int getK();
     
+    void printTable();
+    
 private:
     std::vector< std::map<std::pair<int,int>, int> > table;
     
