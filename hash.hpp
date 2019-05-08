@@ -30,7 +30,9 @@ public:
     
     int contains(int i, int j);
     
-//private:
+    int getK();
+    
+private:
     std::vector< std::map<std::pair<int,int>, int> > table;
     
     int k;

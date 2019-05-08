@@ -13,7 +13,8 @@
 #include "hash.hpp"
 
 int knapsack(int weight[], int val[],int cap, int n);
-int knapsackMem(int weight[], int val[],int cap, int n);
+int knapsackMem(const int weight[], const int val[], const int& cap, const  int& n);
+int knapsackMemHelper(int weight[], const int val[], const int& cap, const int& n, hash& table);
 
 int main(int argc, const char * argv[]) {
     
@@ -25,7 +26,7 @@ int main(int argc, const char * argv[]) {
     int j = 9;
     
     hash test(k, N, cap);
-    std::cout << "index: " << test.h_func(i, j) << std::endl;
+//    std::cout << "index: " << test.h_func(i, j) << std::endl;
     
     int n = 4;
     
@@ -37,7 +38,11 @@ int main(int argc, const char * argv[]) {
     
     int res = knapsack(weight, val, capacity, n);
     
+    int memRes = knapsackMem(weight, val, cap, n);
+    
     std::cout << "result is : " << res << std::endl;
+    
+    std::cout << "mem result is : " << memRes << std::endl;
     
     return 0;
 }
@@ -58,7 +63,7 @@ int knapsack(int weight[], int val[],int cap, int n)
     
     for(j = 0; j <= cap; j++)
     {
-        for(i=0; i<= n;i++)
+        for(i=0; i<= n; i++)
         {
             if(i == 0 || j == 0)
             {
@@ -129,20 +134,45 @@ int knapsack(int weight[], int val[],int cap, int n)
     return k[n][cap ];
 }
 
-int knapsackMem(int weight[], int val[],int cap, int n)
+int knapsackMem(int weight[], const int val[], const int& cap, const int& n)
 {
     int k = 23;
     hash table(k , n, cap);
     for (int i = 0; i <= n; i++)
     {
-        table.insert(i, 0, 0);
+        table.insert(i, 0, -1);
     }
     
-    for (int j = 1; j <= cap; cap++)
+    for (int j = 1; j <= cap; j++)
     {
-        table.insert(0, j, 0);
+        table.insert(0, j, -1);
     }
     
+    return knapsackMemHelper(weight, val, cap, n, table);
+}
+
+int knapsackMemHelper(int weight[], const int val[], const int& cap, const int& n, hash& table)
+{
+    int i, j;
+    int value;
+    for(j = 0; j <= cap; j++)
+    {
+        for(i=0; i<= n; i++)
+        {
+            if(table.contains(i, j) < 0)
+            {
+                if(j < weight[i])
+                {
+                    value = knapsackMemHelper(weight, val, cap, n, table);
+                }
+                else
+                {
+                    value = std::max(knapsackMemHelper(weight, val, j, i-1, table), val[i] + knapsackMemHelper(weight, val, j - weight[i], i-1, table));
+                }
+                table.insert(i, j, value);
+            }
+        }
+    }
     
-    return 0;
+    return table.contains(i, j);
 }

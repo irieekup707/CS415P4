@@ -28,6 +28,13 @@ int hash::contains(int i, int j)
     else { return found->second; }
 }
 
+int getK()
+{
+    return k;
+}
+
+//private
+
 int hash::h_func(int i, int j)
 {
     auto Bn   = getNumBits(n + 1);
