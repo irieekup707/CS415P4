@@ -10,30 +10,39 @@
 #define hash_hpp
 
 #include <iostream>
-#include <list>
-#include <tuple>
+//#include <list>
+#include <map>
+//#include <tuple>
 #include <vector>
+#include <deque>
 #include <math.h>
 #include <algorithm>
+#include <assert.h>
 
 
 
 class hash
 {
 public:
-    hash(int n, int cap);
+    hash(int k, int n, int cap);
     
     void insert(int i, int j, int val);
     
-    bool contains(int i, int j);
+    int contains(int i, int j);
     
 //private:
-    std::vector< std::list<std::tuple<int,int,int> > > table;
+    std::vector< std::map<std::pair<int,int>, int> > table;
     
-    int h_func(int i, int j);
-    
+    int k;
     int n;
     int cap;
+    
+    int h_func(int i, int j);
 };
+
+int getNumBits(int num);
+std::deque<bool> getBitRep(int num);
+template<typename T>
+void printDeque(std::deque<T> InDeque, std::string leadString);
 
 #endif /* hash_hpp */

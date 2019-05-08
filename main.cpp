@@ -13,13 +13,19 @@
 #include "hash.hpp"
 
 int knapsack(int weight[], int val[],int cap, int n);
+int knapsackMem(int weight[], int val[],int cap, int n);
+
 int main(int argc, const char * argv[]) {
     
-    int three = 9;
-    int zero = 0;
+    int k = 23;
+    int N = 10;
+    int cap = 16;
     
-    hash test(three, zero);
-    test.h_func(9, 0);
+    int i = 3;
+    int j = 9;
+    
+    hash test(k, N, cap);
+    std::cout << "index: " << test.h_func(i, j) << std::endl;
     
     int n = 4;
     
@@ -121,4 +127,22 @@ int knapsack(int weight[], int val[],int cap, int n)
     std::cout << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
     
     return k[n][cap ];
+}
+
+int knapsackMem(int weight[], int val[],int cap, int n)
+{
+    int k = 23;
+    hash table(k , n, cap);
+    for (int i = 0; i <= n; i++)
+    {
+        table.insert(i, 0, 0);
+    }
+    
+    for (int j = 1; j <= cap; cap++)
+    {
+        table.insert(0, j, 0);
+    }
+    
+    
+    return 0;
 }

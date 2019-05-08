@@ -8,44 +8,77 @@
 
 #include "hash.hpp"
 
-hash::hash(int n, int cap) : n(n), cap(cap) { }
+hash::hash(int k, int n, int cap) : k(k), n(n), cap(cap)
+{
+    table.resize(k);
+}
 
 void hash::insert(int i, int j, int val)
 {
-    
+    assert(contains(i, i) == -1);
+    auto index = h_func(i, j);
+    table[index].insert(std::make_pair((std::make_pair(i, j)), val));
 }
 
-bool hash::contains(int i, int j)
+int hash::contains(int i, int j)
 {
-    
-    return true;
+    auto index = h_func(i, j);
+    auto found = table[index].find(std::make_pair(i, j));
+    if (found == table[index].end()) { return -1; }
+    else { return found->second; }
 }
 
 int hash::h_func(int i, int j)
 {
-    int iBn = ceil(log2(n+1));
-    std::vector<bool> Bn;
-    while(iBn)
-    {
-        Bn.push_back(iBn & 1);
-        iBn >>= 1;
-        std::cout << "";
-    }
-    std::reverse(Bn.begin(), Bn.end());
+    auto Bn   = getNumBits(n + 1);
+    auto Bcap = getNumBits(cap + 1);
     
-    for (auto bit : Bn)
+    std::deque<bool> Ri = getBitRep(i);
+    std::deque<bool> Rj = getBitRep(j);
+    
+    while(Ri.size() < Bn) { Ri.push_front(0); }
+    while(Rj.size() < Bcap) { Rj.push_front(0); }
+    
+    auto Rij = Ri;
+    Rij.insert(Rij.end(), Rj.begin(), Rj.end());
+    Rij.push_front(1);
+    
+    int iRij = 0;
+    
+    for(auto bit : Rij)
     {
-        std::cout << bit;
+        iRij <<= 1;
+        iRij |= bit;
+    }
+    
+    return iRij % k;
+}
+
+int getNumBits(int num)
+{
+    return ceil(log2(num+1));
+}
+
+std::deque<bool> getBitRep(int num)
+{
+    std::deque<bool> bits;
+    while(num)
+    {
+        bits.push_front(num & 1);
+        num >>= 1;
+        std::cout << "";
+        
+    }
+    return bits;
+}
+
+template<typename T>
+void printDeque(std::deque<T> InDeque, std::string leadString)
+{
+    std::cout << leadString;
+    for(auto e : InDeque)
+    {
+        std::cout << e;
     }
     std::cout << std::endl;
-    int iBcap = ceil(log2(cap+1));
-    
-    int iRi = ceil(log2(i));
-    int iRj = ceil(log2(j));
-    
-    
-    
-    
-    
-    return 0;
 }
