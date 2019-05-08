@@ -7,7 +7,7 @@
 //
 
 #include <iostream>
-
+#include "time.h"
 
 int knapsack(int weight[], int val[],int cap, int n);
 int main(int argc, const char * argv[]) {
@@ -25,9 +25,11 @@ int main(int argc, const char * argv[]) {
     
     return 0;
 }
+
 int knapsack(int weight[], int val[],int cap, int n)
 {
-     int i, j;
+    float startTime = clock();
+    int i, j;
     int k[n+1][cap+1];
     
     for(i=0; i<= n;i++)
@@ -44,5 +46,17 @@ int knapsack(int weight[], int val[],int cap, int n)
             k[i][j] = k[i-1][j];
         }
     }
+    
+    for (int a = 0; a <= n + 1; a++)
+    {
+        for(int b = 0; b <= cap + 1; b++)
+        {
+            std::cout << k[a][b] << ",";
+        }
+        std::cout << std::endl;
+    }
+    
+    std::cout << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
+    
     return k[n][cap ];
 }
