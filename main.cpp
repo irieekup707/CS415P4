@@ -16,10 +16,12 @@ int knapsack(int weight[], int val[],int cap, int n);
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
 
+
+
 int main(int argc, const char * argv[])
 {
     int n = 5;
-    
+        
     int weight[] = {0,2,1,3,2};
     
     int val[] = {0, 12, 10, 20, 15};
@@ -192,34 +194,29 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table)
 {
     int value;
-//    for(int j = 1; j <= cap; j++)
-//    {
-//        for(int i=1; i<= n; i++)
-//        {
+    
     int i = n;
     int j = cap;
-            if(table.contains(i, j) < 0)
-            {
-                if(j < weight[i])
-                {
-                    value = table.contains(i - 1, j);
-                    if (value == -1) { value = knapsackMemHelper(weight, val, j, i - 1, table); }
-//                    assert(value >= 0);
-                }
-                else
-                {
-                    auto first = table.contains(i - 1, j);
-                    if (first == -1) { first = knapsackMemHelper(weight, val, j, i - 1, table); }
-                    
-                    auto second = table.contains(i - 1,  j - weight[i]);
-                    if (second == -1) { second = knapsackMemHelper(weight, val, j - weight[i], i - 1, table); }
-                    
-                    value = std::max(first, val[i] + second);
-                }
-                table.insert(i, j, value);
-            }
-//        }
-//    }
+    
+    if(table.contains(i, j) < 0)
+    {
+        if(j < weight[i])
+        {
+            value = table.contains(i - 1, j);
+            if (value == -1) { value = knapsackMemHelper(weight, val, j, i - 1, table); }
+        }
+        else
+        {
+            auto first = table.contains(i - 1, j);
+            if (first == -1) { first = knapsackMemHelper(weight, val, j, i - 1, table); }
+            
+            auto second = table.contains(i - 1,  j - weight[i]);
+            if (second == -1) { second = knapsackMemHelper(weight, val, j - weight[i], i - 1, table); }
+            
+            value = std::max(first, val[i] + second);
+        }
+        table.insert(i, j, value);
+    }
     
     return table.contains(n, cap);
 }
