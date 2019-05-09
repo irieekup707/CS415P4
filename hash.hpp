@@ -42,10 +42,11 @@ private:
     int cap;
     
     int h_func(int i, int j);
+//    int h_funcOLD(int i, int j);
 };
 
 int getNumBits(int num);
-std::deque<bool> getBitRep(int num);
+//std::deque<bool> getBitRep(int num);
 template<typename T>
 void printDeque(std::deque<T> InDeque, std::string leadString);
 

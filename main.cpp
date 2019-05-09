@@ -7,7 +7,6 @@
 //
 
 #include <iostream>
-//#include <vector>
 #include <algorithm>
 #include "time.h"
 #include "hash.hpp"
@@ -16,12 +15,10 @@ int knapsack(int weight[], int val[],int cap, int n);
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
 
-
-
 int main(int argc, const char * argv[])
 {
     int n = 5;
-        
+    
     int weight[] = {0,2,1,3,2};
     
     int val[] = {0, 12, 10, 20, 15};
@@ -103,7 +100,6 @@ int knapsack(int weight[], int val[],int cap, int n)
             }
             else if((j - weight[i]) >= 0)
             {
-//                std::cout << "W[i] = " << weight[i] << std::endl;
                 auto first = k[i-1][j];
                 int second = val[i] + k[i-1][j-weight[i]];
                 k[i][j] = std::max(first,second);
@@ -112,18 +108,17 @@ int knapsack(int weight[], int val[],int cap, int n)
                 k[i][j] = k[i-1][j];
             
         }
-//        std::cout << "===========================\n";
     }
     
-    for (int a = 0; a <= n; a++)
-    {
-        for(int b = 0; b <= cap; b++)
-        {
-            std::cout << k[a][b] << ",";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "---------------------" << std::endl;
+//    for (int a = 0; a <= n; a++)
+//    {
+//        for(int b = 0; b <= cap; b++)
+//        {
+//            std::cout << k[a][b] << ",";
+//        }
+//        std::cout << "\n";
+//    }
+//    std::cout << "---------------------" << std::endl;
     
     j = cap;
     i = n;
@@ -139,7 +134,6 @@ int knapsack(int weight[], int val[],int cap, int n)
         {
             i--;
         }
-//        optimalValues.push_front(std::make_pair(weight[i], val[i]));
         optimalSet.push_front(i);
         j -= weight[i];
         i--;
@@ -147,20 +141,12 @@ int knapsack(int weight[], int val[],int cap, int n)
         
     }
     
-//    std::reverse(optimalValues.begin(), optimalValues.end());
-//    std::reverse(optimalSet.begin(), optimalSet.end());
-    
-//    for (auto item : optimalValues)
-//    {
-//        std::cout << item.first << "," << item.second << ";";
-//    }
     std::cout << "optimal set: ";
     for (auto item : optimalSet)
     {
         std::cout << item << ",";
     }
-    std::cout << std::endl;
-    std::cout << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
+    std::cout << std::endl << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
     
     return k[n][cap];
 }
@@ -182,15 +168,15 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
     }
     
     auto optimalVal = knapsackMemHelper(weight, val, cap, n, table);
-    for (int i = 0; i <= n; i++)
-    {
-        for(int j = 0; j <= cap; j++)
-        {
-            std::cout << table.contains(i, j) << ",";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "---------------------" << std::endl;
+//    for (int i = 0; i <= n; i++)
+//    {
+//        for(int j = 0; j <= cap; j++)
+//        {
+//            std::cout << table.contains(i, j) << ",";
+//        }
+//        std::cout << "\n";
+//    }
+//    std::cout << "---------------------" << std::endl;
     
     int i = n;
     int j = cap;
@@ -205,7 +191,7 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
         {
             i--;
         }
-        //        optimalValues.push_front(std::make_pair(weight[i], val[i]));
+
         optimalSet.push_front(i);
         j -= weight[i];
         i--;
@@ -213,21 +199,12 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
         
     }
     
-    //    std::reverse(optimalValues.begin(), optimalValues.end());
-//    std::reverse(optimalSet.begin(), optimalSet.end());
-    
-    //    for (auto item : optimalValues)
-    //    {
-    //        std::cout << item.first << "," << item.second << ";";
-    //    }
     std::cout << "optimal set: ";
     for (auto item : optimalSet)
     {
         std::cout << item << ",";
     }
-    
-    std::cout << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
-    std::cout << std::endl;
+    std::cout << std::endl << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
     return optimalVal;
 }
 
