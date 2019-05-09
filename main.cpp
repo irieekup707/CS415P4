@@ -183,5 +183,5 @@ int knapsackMemHelper(const int weight[], const int val[], const int& cap, const
     }
 //    std::cout << "i: " << i << ", j: " << j << std::endl;
     
-    return table.contains(i, j);
+    return table.contains(n, cap);
 }
