@@ -192,16 +192,19 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table)
 {
     int value;
-    for(int j = 1; j <= cap; j++)
-    {
-        for(int i=1; i<= n; i++)
-        {
+//    for(int j = 1; j <= cap; j++)
+//    {
+//        for(int i=1; i<= n; i++)
+//        {
+    int i = n;
+    int j = cap;
             if(table.contains(i, j) < 0)
             {
                 if(j < weight[i])
                 {
                     value = table.contains(i - 1, j);
-                    assert(value >= 0);
+                    if (value == -1) { value = knapsackMemHelper(weight, val, j, i - 1, table); }
+//                    assert(value >= 0);
                 }
                 else
                 {
@@ -215,8 +218,8 @@ int knapsackMemHelper(const int weight[], const int val[], const int& cap, const
                 }
                 table.insert(i, j, value);
             }
-        }
-    }
+//        }
+//    }
     
     return table.contains(n, cap);
 }
