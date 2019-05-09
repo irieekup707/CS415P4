@@ -10,29 +10,8 @@
 #define heap_hpp
 
 #include <stdio.h>
+#include <iostream>
 #include <deque>
-
-class node;
-
-class heap
-{
-public:
-    heap();
-    void heapify();
-    bool insert();
-    
-    int size();
-    bool isEmpty();
-    
-    node getMax();
-    node popMax();
-    
-private:
-    std::deque<node> data;
-    
-    int Size;
-    
-};
 
 class node
 {
@@ -48,7 +27,33 @@ private:
     int parent;
     int left;
     int right;
-
+    
+    void swap(node &R);
+    
 };
+
+class heap
+{
+public:
+    heap();
+    void heapify(std::deque<node> in_data);
+    bool insert();
+    
+    int size();
+    bool isEmpty();
+    
+    node getMax();
+    node popMax();
+    
+    void printeHeap();
+    
+private:
+    std::deque<node> data;
+    
+    int Size;
+    
+};
+
+
 
 #endif /* heap_hpp */
