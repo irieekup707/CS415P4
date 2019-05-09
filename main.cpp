@@ -10,21 +10,21 @@
 #include <algorithm>
 #include "time.h"
 #include "hash.hpp"
-void weightValueSort(int weight[], int val[], int cap, int n);
+void greedySortSack(int weight[], int val[], int cap, int n);
 int knapsack(int weight[], int val[],int cap, int n);
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
 
 int main(int argc, const char * argv[])
 {
-    int n = 5;
+    int n = 8;
     
-    int weight[] = {0,2,1,3,2};
+    int weight[] = {0,2,1,3,2,2,3,4};
     
-    int val[] = {0, 12, 10, 20, 15};
+    int val[] = {0, 12, 10, 20, 15, 20, 25, 30};
     
-    int capacity = 5;
-    weightValueSort(weight, val, capacity, n);
+    int capacity = 10;
+    greedySortSack(weight, val, capacity, n);
     //int res = knapsack(weight, val, capacity, n);
     
     //std::cout << "result is : " << res << std::endl << std::endl;
@@ -36,17 +36,16 @@ int main(int argc, const char * argv[])
     return 0;
 }
 
-void weightValueSort(int weight[], int val[], int cap, int n)
+void greedySortSack(int weight[], int val[], int cap, int n)
 {
-    int j=1;
-    std::deque<std::pair<std::pair<int, int>, std::pair<int, int>> > values;
-    std::pair<int,int> weightValRatio;
+    std::deque<std::pair<std::pair<float, int>, std::pair<int, int>> > values;
+    std::pair<float,int> weightValRatio;
     std::pair<int,int> weightAndVal;
-    std::pair<std::pair<int,int>,std::pair<int,int>> weightValPair;
+    std::pair<std::pair<float,int>,std::pair<int,int>> weightValPair;
     std::deque<int> optimalSet;
     for(int i =1; i < n; i++)
     {
-        weightValRatio = std::make_pair(( val[i]/weight[i]),i);
+        weightValRatio = std::make_pair(( val[i]/float(weight[i])),i);
         weightAndVal = std::make_pair(weight[i], val[i]);
         weightValPair = std::make_pair(weightValRatio,weightAndVal);
         values.push_back(weightValPair);
@@ -58,21 +57,24 @@ void weightValueSort(int weight[], int val[], int cap, int n)
     {
         std::cout << "val/weight is : " <<  values[i].first.first << "  item is : " << values[i].first.second << " Weight is " << values[i].second.first<< std::endl;
     }
-    if(values[1].second.first <= cap)
+    
+    int curCap = 0;
+//    if(values[1].second.first <= cap)
+//    {
+//        curCap = values[0].second.first;
+//        optimalSet.push_front(values[0].first.second);
+//    }
+//    std::cout << " curCap is : " << curCap << std::endl;
+    int k = 0;
+    while((curCap < cap) && (k <= n))
     {
-        j = values[0].second.first;
-        optimalSet.push_front(values[0].first.second);
-    }
-    std::cout << " j is : " << j << std::endl;
-    int k = 1;
-    while(j <= cap)
-    {
-        if((j + values[k].second.first) <= cap)
+        if((curCap + values[k].second.first) <= cap)
            {
-               j = j + values[k].second.first;
+               curCap = curCap + values[k].second.first;
                optimalSet.push_front(values[k].first.second);
-               std::cout << " j is : " << j << std::endl;
+               std::cout << " curCap is : " << curCap << " Item is" <<  std::endl;
            }
+        k++;
     }
 }
 
