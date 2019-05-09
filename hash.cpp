@@ -18,14 +18,12 @@ void hash::insert(int i, int j, int val)
     assert(contains(i, j) == -1);
     auto index = h_func(i, j);
     table[index].insert(std::make_pair((std::make_pair(i, j)), val));
-//    std::cout << "insert=i:" << i << " j:" << j << " val:" << val << " ind:" << index << std::endl;
 }
 
 int hash::contains(int i, int j)
 {
     auto index = h_func(i, j);
     auto found = table[index].find(std::make_pair(i, j));
-//    std::cout << "contains=i:" << i << " j:" << j << " ind:" << index << std::endl;
     if (found == table[index].end()) { return -1; }
     else { return found->second; }
 }
@@ -84,8 +82,6 @@ std::deque<bool> getBitRep(int num)
     {
         bits.push_front(num & 1);
         num >>= 1;
-        std::cout << "";
-        
     }
     return bits;
 }

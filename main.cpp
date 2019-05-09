@@ -7,7 +7,7 @@
 //
 
 #include <iostream>
-#include <vector>
+//#include <vector>
 #include <algorithm>
 #include "time.h"
 #include "hash.hpp"
@@ -16,18 +16,8 @@ int knapsack(int weight[], int val[],int cap, int n);
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
 
-int main(int argc, const char * argv[]) {
-    
-//    int k = 23;
-//    int N = 10;
-//    int cap = 16;
-//
-//    int i = 3;
-//    int j = 9;
-    
-//    hash test(k, N, cap);
-//    std::cout << "index: " << test.h_func(i, j) << std::endl;
-    
+int main(int argc, const char * argv[])
+{
     int n = 5;
     
     int weight[] = {0,2,1,3,2};
@@ -36,13 +26,13 @@ int main(int argc, const char * argv[]) {
     
     int capacity = 5;
     
-//    int res = knapsack(weight, val, capacity, n);
+    int res = knapsack(weight, val, capacity, n);
+    
+    std::cout << "result is : " << res << std::endl << std::endl;
     
     int memRes = knapsackMem(weight, val, capacity, n);
     
-//    std::cout << "result is : " << res << std::endl;
-    
-    std::cout << "mem result is : " << memRes << std::endl;
+    std::cout << "mem result is : " << memRes << std::endl << std::endl;
     
     return 0;
 }
@@ -91,15 +81,15 @@ int knapsack(int weight[], int val[],int cap, int n)
         }
         std::cout << "\n";
     }
-    std::cout << "---------------------\n";
+    std::cout << "---------------------" << std::endl;
     
     j = cap;
     i = n;
     
     int current = k[i][j];
-//    std::cout << current;
-    std::vector<std::pair<int, int> > optimalValues;
-    std::vector<int> optimalSet;
+
+    std::deque<std::pair<int, int> > optimalValues;
+    std::deque<int> optimalSet;
 
     while(j > 0)
     {
@@ -107,23 +97,22 @@ int knapsack(int weight[], int val[],int cap, int n)
         {
             i--;
         }
-        optimalValues.push_back(std::make_pair(weight[i], val[i]));
-        optimalSet.push_back(i);
+//        optimalValues.push_front(std::make_pair(weight[i], val[i]));
+        optimalSet.push_front(i);
         j -= weight[i];
         i--;
         current = k[i][j];
         
     }
     
-//    optimalSet.push_back(std::make_pair(weight[i], val[i]));
-    
-    std::reverse(optimalValues.begin(), optimalValues.end());
-    std::reverse(optimalSet.begin(), optimalSet.end());
+//    std::reverse(optimalValues.begin(), optimalValues.end());
+//    std::reverse(optimalSet.begin(), optimalSet.end());
     
 //    for (auto item : optimalValues)
 //    {
 //        std::cout << item.first << "," << item.second << ";";
 //    }
+    std::cout << "optimal set: ";
     for (auto item : optimalSet)
     {
         std::cout << item << ",";
@@ -131,11 +120,13 @@ int knapsack(int weight[], int val[],int cap, int n)
     std::cout << std::endl;
     std::cout << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
     
-    return k[n][cap ];
+    return k[n][cap];
 }
 
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n)
 {
+    float startTime = clock();
+    
     int k = 23;
     hash table(k , n, cap);
     for (int i = 0; i <= n; i++)
@@ -148,16 +139,62 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
         table.insert(0, j, 0);
     }
     
-    return knapsackMemHelper(weight, val, cap, n, table);
+    auto optimalVal = knapsackMemHelper(weight, val, cap, n, table);
+    for (int i = 0; i <= n; i++)
+    {
+        for(int j = 0; j <= cap; j++)
+        {
+            std::cout << table.contains(i, j) << ",";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "---------------------" << std::endl;
+    
+    int i = n;
+    int j = cap;
+    int current = table.contains(i, j);
+    
+    std::deque<std::pair<int, int> > optimalValues;
+    std::deque<int> optimalSet;
+    
+    while(j > 0)
+    {
+        while(current == table.contains(i - 1, j))
+        {
+            i--;
+        }
+        //        optimalValues.push_front(std::make_pair(weight[i], val[i]));
+        optimalSet.push_front(i);
+        j -= weight[i];
+        i--;
+        current = table.contains(i, j);
+        
+    }
+    
+    //    std::reverse(optimalValues.begin(), optimalValues.end());
+//    std::reverse(optimalSet.begin(), optimalSet.end());
+    
+    //    for (auto item : optimalValues)
+    //    {
+    //        std::cout << item.first << "," << item.second << ";";
+    //    }
+    std::cout << "optimal set: ";
+    for (auto item : optimalSet)
+    {
+        std::cout << item << ",";
+    }
+    
+    std::cout << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
+    std::cout << std::endl;
+    return optimalVal;
 }
 
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table)
 {
-    int i, j;
     int value;
-    for(j = 1; j <= cap; j++)
+    for(int j = 1; j <= cap; j++)
     {
-        for(i=1; i<= n; i++)
+        for(int i=1; i<= n; i++)
         {
             if(table.contains(i, j) < 0)
             {
@@ -177,11 +214,9 @@ int knapsackMemHelper(const int weight[], const int val[], const int& cap, const
                     value = std::max(first, val[i] + second);
                 }
                 table.insert(i, j, value);
-                table.printTable();
             }
         }
     }
-//    std::cout << "i: " << i << ", j: " << j << std::endl;
     
     return table.contains(n, cap);
 }
