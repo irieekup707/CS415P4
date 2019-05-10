@@ -11,7 +11,10 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <limits>
+
 #include <deque>
+#include <queue>
 
 class node
 {
@@ -24,11 +27,7 @@ private:
     int val;
     int item;
     
-    int parent;
-    int left;
-    int right;
-    
-    void swap(node &R);
+    void print();
     
 };
 
@@ -47,13 +46,15 @@ public:
     node getMax();
     node popMax();
     
-    void printeHeap();
+    void print();
     
 private:
     std::deque<node> data;
     
-    int Size;
+//    void swap(int i, int j);
+    void promote(const int& parent, const int& candidate);
     
+    void setLR(const int& parent, int& L, int& R) const;
 };
 
 

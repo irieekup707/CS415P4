@@ -26,9 +26,10 @@ int main(int argc, const char * argv[])
     
     int capacity = 10;
     
-//    heap(n, weight, val, capacity);
+    heap test(n, weight, val, capacity);
+    test.print();
     
-    greedySortSack(weight, val, capacity, n);
+//    greedySortSack(weight, val, capacity, n);
     //int res = knapsack(weight, val, capacity, n);
     
     //std::cout << "result is : " << res << std::endl << std::endl;
