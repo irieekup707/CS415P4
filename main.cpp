@@ -7,7 +7,11 @@
 //
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
 #include <algorithm>
+#include <assert.h>
 #include "time.h"
 #include "hash.hpp"
 #include "heap.hpp"
@@ -15,8 +19,98 @@ void greedySortSack(int weight[], int val[], int cap, int n);
 int knapsack(int weight[], int val[],int cap, int n);
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
 int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
+bool isInt(const std::string& str);
+int getInt(std::ifstream& stream);
 
 int main(int argc, const char * argv[])
+{
+    while (true)
+    {
+        //Get three files. Keep asking until valid path is specified for each.
+        std::string input = "";
+        std::ifstream capFile, weightFile, valFile;
+        std::ifstream* file;
+        
+        int cap, n = 0;
+        std::vector<int> weights, vals;
+        
+        std::string specifier;
+        int i = 0;
+        while(i < 3)
+        {
+            switch (i) {
+                case 0:
+                    specifier = "capacity";
+                    file = &capFile;
+                    break;
+                case 1:
+                    specifier = "weights";
+                    file = &weightFile;
+                    break;
+                case 2:
+                    specifier = "values";
+                    file = &valFile;
+                    break;
+                default:
+                    assert(false);
+                    break;
+            }
+            std::cout << "Enter file containing the " << specifier << ": ";
+            getline(std::cin, input);
+            file->open(input);
+            if(!(*file))
+            {
+                std::cout << "Invalid file path specified. ";
+            }
+            else
+            {
+                switch (i)
+                {
+                    case 0:
+                        cap = getInt(capFile);
+                        if(cap >= 0) { i++; }
+                        break;
+                    case 1:
+                        while(weightFile)
+                        {
+                            weights.push_back(getInt(weightFile));
+                            if(weights.back() < 0)
+                            {
+                                weights.clear();
+                                break;
+                            }
+                        }
+                        i++;
+                        n = int(weights.size());
+                        break;
+                    case 2:
+                        while(weightFile)
+                        {
+                            vals.push_back(getInt(valFile));
+                            if(vals.back() < 0)
+                            {
+                                vals.clear();
+                                break;
+                            }
+                        }
+                        if(n != vals.size())
+                        {
+                            i--;
+                        }
+                    default:
+                        assert(false);
+                        break;
+                }
+                
+            }
+        }
+    }
+    
+    return 0;
+}
+
+
+int mainOLD(int argc, const char * argv[])
 {
     int n = 8;
     
@@ -243,4 +337,26 @@ int knapsackMemHelper(const int weight[], const int val[], const int& cap, const
     }
     
     return table.contains(n, cap);
+}
+
+bool isInt(const std::string& str)
+{
+    for (auto c : str)
+    {
+        if (!isdigit(c)) { return false; }
+    }
+    
+    return true;
+}
+
+int getInt(std::ifstream& stream)
+{
+    std::string token;
+    stream >> token;
+    if (!isInt(token))
+    {
+        std::cerr << "File provided contains non-integer value. " << std::endl;
+        return -1;
+    }
+    return stoi(token);
 }
