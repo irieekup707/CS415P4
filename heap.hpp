@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <limits>
+#include <cfloat>
 
 #include <deque>
 #include <queue>
@@ -27,7 +27,8 @@ private:
     int val;
     int item;
     
-    void print();
+    void print(std::string delim, int endl = 1);
+    void print(std::string delim, std::string end);
     
 };
 
@@ -37,7 +38,8 @@ public:
     heap();
     heap(int n, int weight[], int val[], int capacity);
     
-    void heapify(std::deque<node> in_data);
+    void heapify();
+//    void heapify(std::deque<node>& in_data);
     bool insert();
     
     int size();
@@ -52,9 +54,11 @@ private:
     std::deque<node> data;
     
 //    void swap(int i, int j);
-    void promote(const int& parent, const int& candidate);
+    void propogate(int parent);
     
     void setLR(const int& parent, int& L, int& R) const;
+    
+    bool midLeafHandle(const int& parent, const int& L, const int& R);
 };
 
 

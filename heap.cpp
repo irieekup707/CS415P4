@@ -15,55 +15,56 @@ heap::heap()
 
 heap::heap(int n, int weight[], int val[], int capacity)
 {
-    std::deque<node> not_heap;
     //dummy-sentinel root node so index math works
-    not_heap.push_back(node(INT_MAX, 0, 0, 0));
+    std::deque<node> not_heap = { node(FLT_MAX, 0, 0, 0) };
     
     for (int i = 0; i < n; i++)
     {
-        not_heap.push_back(node(val[i]/float(weight[i]), weight[i], val[i], i));
+        float ratio = (weight[i])? val[i]/float(weight[i]) : 0;
+        not_heap.push_back(node(ratio, weight[i], val[i], i));
     }
-    
 //    for (auto e : not_heap)
 //    {
-//        e.print();
-//        std::cout << std::endl;
+//        e.print(",");
 //    }
-//    std::cout << std::endl;
+    data = not_heap;
     
-    heapify(not_heap);
+    heapify();
 }
 
-void heap::heapify(std::deque<node> in_data)
+//void heap::heapify()
+//{
+//    heapify(data);
+//}
+
+void heap::heapify()
 {
-    data = in_data;
     //dummy-sentinel root node so index math works
     data.push_back(node(INT_MAX, 0, 0, 0));
     
-    int i = int(data.size())/2;
+//    int i = int(data.size())/2;
     
-    int L, R, greater;
-    //this does the first iteration outside the loop, with checks for r == -1,
-    //because in the loop we don't need to check
-    setLR(i, L, R);
-    if(R == -1) { greater = L; }
-    else
-    {
-        greater = (data[L].ratio > data[R].ratio)? L : R;
-    }
-    
-    promote(i, greater);
-    
+//    int L, R, greater;
+//    //this does the first iteration outside the loop, with checks for r == -1,
+//    //because in the loop we don't need to check
+//    setLR(i, L, R);
+//    if(R == -1) { greater = L; }
+//    else
+//    {
+//        greater = (data[L].ratio > data[R].ratio)? L : R;
+//    }
+//    //single promotion rather than full propogation because we're at bottom level
+//    if(data[greater].ratio > data[i].ratio)
+//    {
+//        std::swap(data[greater], data[i]);
+//    }
+//
     //i-- before loop so we don't re-do the first iteration
-    for(i--; i >= 1 ; i--)
+    for(int i = int(data.size())/2; i >= 1 ; i--)
     {
         //NOT using setLR because we don't need the check, R always < data.size()
-        L = 2 * i;
-        R = L + 1;
-        //also no check for -1 is needed
-        greater = (data[L].ratio > data[R].ratio)? L : R;
-
-        promote(i, greater);
+        propogate(i);
+        
     }
 }
 
@@ -96,19 +97,7 @@ node heap::popMax()
     std::swap(data[1], data.back());
     data.pop_back();
     
-    int propogater = 1;
-    int L, R;
-    setLR(propogater, L, R);
-    
-    while (((L > 0) && (data[L].ratio > data[propogater].ratio)) || ((R > 0) && (data[R].ratio > data[propogater].ratio)))
-    {
-        int greater = (data[L].ratio > data[R].ratio)? L : R;
-        
-        std::swap(greater, propogater);
-        
-        propogater = greater;
-        setLR(propogater, L, R);
-    }
+    propogate(1);
     
     return max;
 }
@@ -132,8 +121,7 @@ void heap::print()
                 parent = currQ->front();
                 currQ->pop();
                 
-                data[parent].print();
-                std::cout << "|";
+                data[parent].print(",","|");
                 
                 setLR(parent, L, R);
                 
@@ -149,11 +137,21 @@ void heap::print()
 
 //private
 
-void heap::promote(const int& parent, const int& candidate)
+void heap::propogate(int parent)
 {
-    if(data[candidate].ratio > data[parent].ratio)
+    int L, R;
+    setLR(parent, L, R);
+    if(midLeafHandle(parent, L, R)) { return; };
+    
+    while ( (data[L].ratio > data[parent].ratio) || (data[R].ratio > data[parent].ratio) )
     {
-        std::swap(data[parent], data[candidate]);
+        int greater = (data[L].ratio > data[R].ratio)? L : R;
+        
+        std::swap(data[parent], data[greater]);
+        
+        parent = greater;
+        setLR(parent, L, R);
+        if(midLeafHandle(parent, L, R)) { return; };
     }
 }
 
@@ -168,6 +166,17 @@ void heap::setLR(const int& parent, int& L, int& R) const
     }
 }
 
+bool heap::midLeafHandle(const int& parent, const int& L, const int& R)
+{
+    if (L < 0) { return true; }
+    if (R < 0)
+    {
+        if(data[L].ratio > data[parent].ratio) { std::swap(data[parent], data[L]); }
+        return true;
+    }
+    return false;
+}
+
 //node
 
 node::node(float ratio, int weight, int val, int item) :
@@ -179,10 +188,18 @@ item(item)
     
 }
 
-void node::print()
+void node::print(std::string delim, int endl)
 {
-    std::cout << ratio << "," << weight << "," << val << "," << item;
+    std::cout << ratio << delim << weight << delim << val << delim << item;
+    for(int i = 0; i < endl; i++)
+    {
+        std::cout << std::endl;
+    }
 }
 
+void node::print(std::string delim, std::string end)
+{
+    std::cout << ratio << delim << weight << delim << val << delim << item << end;
+}
 
 
