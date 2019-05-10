@@ -10,6 +10,7 @@
 #include <algorithm>
 #include "time.h"
 #include "hash.hpp"
+#include "heap.hpp"
 void greedySortSack(int weight[], int val[], int cap, int n);
 int knapsack(int weight[], int val[],int cap, int n);
 int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
@@ -24,6 +25,9 @@ int main(int argc, const char * argv[])
     int val[] = {0, 12, 10, 20, 15, 20, 25, 30};
     
     int capacity = 10;
+    
+//    heap(n, weight, val, capacity);
+    
     greedySortSack(weight, val, capacity, n);
     //int res = knapsack(weight, val, capacity, n);
     

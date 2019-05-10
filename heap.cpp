@@ -13,14 +13,41 @@ heap::heap() : Size(0)
     
 }
 
+heap::heap(int n, int weight[], int val[], int capacity)
+{
+    std::deque<node> not_heap;
+    
+    for (int i = 0; i < n; i++)
+    {
+        not_heap.push_back(node(val[i]/float(weight[i]), weight[i], val[i], i));
+    }
+    
+    for (auto e : not_heap)
+    {
+        std::cout << e.ratio << "," << e.weight << "," << e.val << "," << e.item << std::endl;
+    }
+    std::cout << std::endl;
+}
+
 void heap::heapify(std::deque<node> in_data)
 {
-    
+    int left, right;
+    for(int i = in_data.size()/2; i >= 0 ; i--)
+    {
+        left = 2 * i;
+        right = left + 1;
+        node& greater = (in_data[left].ratio > in_data[right].ratio)? in_data[left] : in_data[right];
+        if(greater.ratio > in_data[i].ratio)
+        {
+            greater.swap(in_data[i]);
+        }
+    }
 }
 
 bool heap::insert()
 {
-
+    
+    return false;
 }
 
 

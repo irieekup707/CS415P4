@@ -36,6 +36,8 @@ class heap
 {
 public:
     heap();
+    heap(int n, int weight[], int val[], int capacity);
+    
     void heapify(std::deque<node> in_data);
     bool insert();
     
