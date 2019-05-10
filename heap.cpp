@@ -64,7 +64,6 @@ void heap::heapify()
     {
         //NOT using setLR because we don't need the check, R always < data.size()
         propogate(i);
-        
     }
 }
 
