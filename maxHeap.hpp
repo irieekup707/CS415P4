@@ -20,7 +20,7 @@ class node
 {
     node(float ratio, int weight, int val, int item);
 private:
-    friend class heap;
+    friend class maxHeap;
     
     float ratio;
     int weight;
@@ -32,11 +32,11 @@ private:
     
 };
 
-class heap
+class maxHeap
 {
 public:
-    heap();
-    heap(int n, int weight[], int val[], int capacity);
+    maxHeap();
+    maxHeap(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
     
     void heapify();
 //    void heapify(std::deque<node>& in_data);

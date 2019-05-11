@@ -12,13 +12,15 @@
 #include <vector>
 #include <algorithm>
 #include <assert.h>
+#include <string>
 #include "time.h"
 #include "hash.hpp"
-#include "heap.hpp"
-void greedySortSack(int weight[], int val[], int cap, int n);
-int knapsack(int weight[], int val[],int cap, int n);
-int knapsackMem(const int weight[], const int val[], const int& cap, const int& n);
-int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table);
+#include "maxHeap.hpp"
+void greedySortSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
+void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
+int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
+int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, const int& n);
+int knapsackMemHelper(std::deque<int>& weight, std::deque<int>& val, const int& cap, const int& n, hash& table);
 bool isInt(const std::string& str);
 int getInt(std::ifstream& stream);
 
@@ -32,7 +34,7 @@ int main(int argc, const char * argv[])
         std::ifstream* file;
         
         int cap, n = 0;
-        std::vector<int> weights, vals;
+        std::deque<int> weights, vals;
         
         std::string specifier;
         int i = 0;
@@ -58,7 +60,7 @@ int main(int argc, const char * argv[])
             std::cout << "Enter file containing the " << specifier << ": ";
             getline(std::cin, input);
             file->open(input);
-            if(!(*file))
+            if(!file->is_open())
             {
                 std::cout << "Invalid file path specified. ";
             }
@@ -71,20 +73,25 @@ int main(int argc, const char * argv[])
                         if(cap >= 0) { i++; }
                         break;
                     case 1:
-                        while(weightFile)
+                        while(isspace(weightFile.peek())) { weightFile.ignore(1); }
+                        while(weightFile.peek() != EOF)
                         {
+                            
                             weights.push_back(getInt(weightFile));
                             if(weights.back() < 0)
                             {
                                 weights.clear();
                                 break;
                             }
+                            while(isspace(weightFile.peek())) { weightFile.ignore(1); }
                         }
+                        
                         i++;
                         n = int(weights.size());
                         break;
                     case 2:
-                        while(weightFile)
+                        while(isspace(valFile.peek())) { valFile.ignore(1); }
+                        while(valFile.peek() != EOF)
                         {
                             vals.push_back(getInt(valFile));
                             if(vals.back() < 0)
@@ -92,71 +99,57 @@ int main(int argc, const char * argv[])
                                 vals.clear();
                                 break;
                             }
+                            while(isspace(valFile.peek())) { valFile.ignore(1); }
                         }
-                        if(n != vals.size())
-                        {
-                            i--;
-                        }
+                        if(n != vals.size()) { i--; }
+                        else { i++; }
+                        break;
                     default:
                         assert(false);
                         break;
+                        
                 }
-                
             }
         }
+        
+        std::cout << std::endl << "Knapsack capacity = " << cap << ". Total number of items = " << n << std::endl << std::endl;
+        
+        knapsack(weights, vals, cap, n);
+        knapsackMem(weights, vals, cap, n);
+        greedySortSack(weights, vals, cap, n);
+
     }
     
     return 0;
 }
 
 
-int mainOLD(int argc, const char * argv[])
+void greedySortSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 {
-    int n = 8;
+    float startTime = clock();
     
-    int weight[] = {0,2,1,3,2,2,3,4};
-    
-    int val[] = {0, 12, 10, 20, 15, 20, 25, 30};
-    
-    int capacity = 10;
-    
-    heap test(n, weight, val, capacity);
-    test.print();
-    
-//    greedySortSack(weight, val, capacity, n);
-    //int res = knapsack(weight, val, capacity, n);
-    
-    //std::cout << "result is : " << res << std::endl << std::endl;
-    
-    //int memRes = knapsackMem(weight, val, capacity, n);
-    
-    //std::cout << "mem result is : " << memRes << std::endl << std::endl;
-    
-    return 0;
-}
-
-void greedySortSack(int weight[], int val[], int cap, int n)
-{
     std::deque<std::pair<std::pair<float, int>, std::pair<int, int>> > values;
+    std::deque<std::pair<std::pair<float, int>, std::pair<int, int>> > unsorted;
     std::pair<float,int> weightValRatio;
     std::pair<int,int> weightAndVal;
     std::pair<std::pair<float,int>,std::pair<int,int>> weightValPair;
     std::deque<int> optimalSet;
-    for(int i =1; i < n; i++)
+    for(int i = 0; i < n; i++)
     {
-        weightValRatio = std::make_pair(( val[i]/float(weight[i])),i);
+        weightValRatio = std::make_pair(( val[i]/float(weight[i])), i + 1);
         weightAndVal = std::make_pair(weight[i], val[i]);
         weightValPair = std::make_pair(weightValRatio,weightAndVal);
         values.push_back(weightValPair);
     }
   
+    unsorted = values;
 
     sort (values.begin(), values.end(), std::greater<>());
-    for(auto i =0; i < values.size(); i++)
-    {
-        std::cout << "val/weight is : " <<  values[i].first.first << "  item is : " << values[i].first.second << " Weight is " << values[i].second.first<< std::endl;
-    }
-    
+//    for(auto i =0; i < values.size(); i++)
+//    {
+//        std::cout << "val/weight is : " <<  values[i].first.first << "  item is : " << values[i].first.second << " Weight is " << values[i].second.first<< std::endl;
+//    }
+//
     int curCap = 0;
 //    if(values[1].second.first <= cap)
 //    {
@@ -164,45 +157,81 @@ void greedySortSack(int weight[], int val[], int cap, int n)
 //        optimalSet.push_front(values[0].first.second);
 //    }
 //    std::cout << " curCap is : " << curCap << std::endl;
-    int k = 0;
-    while((curCap < cap) && (k <= n))
+    int it = 0;
+    while((curCap + values[it].second.first <= cap) && (it < n))
     {
-        if((curCap + values[k].second.first) <= cap)
-           {
-               curCap = curCap + values[k].second.first;
-               optimalSet.push_front(values[k].first.second);
-               std::cout << " curCap is : " << curCap << " Item is" <<  std::endl;
-           }
-        k++;
+//        if((curCap + values[it].second.first) <= cap)
+//        {
+            curCap += values[it].second.first;
+            optimalSet.push_back(values[it].first.second);
+//            std::cout << " curCap is : " << curCap << " Item is: " << values[it].first.second << " Val is: " << values[it].second.second << std::endl;
+//        }
+        it++;
+    }
+    int optVal = 0;
+    for (auto e : optimalSet)
+    {
+        optVal += unsorted[e - 1].second.second;
+    }
+    std::cout << "Greedy Approach Optimal value: " << optVal << std::endl;
+    std::cout << "Greedy Approach Optimal subset: ";
+    for (auto item : optimalSet)
+    {
+        std::cout << item << ", ";
+    }
+    
+    std::cout << std::endl << "Greedy Approach Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+}
+
+void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
+{//ratio, weight, val, item
+    maxHeap h(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
+
+    int it = 0, curCap = 0;
+    
+    
+    node tempNode = (h.popMax());
+    while((curCap + tempNode. <= cap) && (it < n))
+    {
+        //        if((curCap + values[it].second.first) <= cap)
+        //        {
+        curCap += values[it].second.first;
+        optimalSet.push_back(values[it].first.second);
+        //            std::cout << " curCap is : " << curCap << " Item is: " << values[it].first.second << " Val is: " << values[it].second.second << std::endl;
+        //        }
+        it++;
     }
 }
 
-int knapsack(int weight[], int val[],int cap, int n)
+int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 {
     float startTime = clock();
     int i, j;
     int k[n+1][cap+1];
+    weight.push_front(0);
+    val.push_front(0);
     
-    for (int a = 0; a <= n; a++)
-    {
-        for(int b = 0; b <= cap; b++)
-        {
-            k[a][b] = -1;
-        }
-    }
+//    for (int a = 0; a <= n; a++)
+//    {
+//        for(int b = 0; b <= cap; b++)
+//        {
+//            k[a][b] = -1;
+//        }
+//    }
     
     for(j = 0; j <= cap; j++)
     {
-        for(i=0; i<= n; i++)
+        for(i = 0; i<= n; i++)
         {
             if(i == 0 || j == 0)
             {
-                k[i][j]= 0;
+                k[i][j] = 0;
             }
             else if((j - weight[i]) >= 0)
             {
                 auto first = k[i-1][j];
-                int second = val[i] + k[i-1][j-weight[i]];
+                auto second = val[i] + k[i-1][j-weight[i]];
+//                std::cout << "val[i]" << val[i] << "[" << i << "]" << std::endl;
                 k[i][j] = std::max(first,second);
             }
             else
@@ -226,7 +255,7 @@ int knapsack(int weight[], int val[],int cap, int n)
     
     int current = k[i][j];
 
-    std::deque<std::pair<int, int> > optimalValues;
+//    std::deque<std::pair<int, int> > optimalValues;
     std::deque<int> optimalSet;
 
     while(j > 0)
@@ -235,6 +264,7 @@ int knapsack(int weight[], int val[],int cap, int n)
         {
             i--;
         }
+//        optimalValues.push_front(std::make_pair(weight[i], val[i]));
         optimalSet.push_front(i);
         j -= weight[i];
         i--;
@@ -242,19 +272,33 @@ int knapsack(int weight[], int val[],int cap, int n)
         
     }
     
-    std::cout << "optimal set: ";
+//    std::cout << "optimal vals: ";
+//    for (auto item : optimalValues)
+//    {
+//        std::cout << item.first << "," << item.second << ";";
+//    }
+    
+    std::cout << "Traditional Dynamic Programming Optimal value: " << k[n][cap] << std::endl;
+    std::cout << "Traditional Dynamic Programming Optimal subset: ";
     for (auto item : optimalSet)
     {
-        std::cout << item << ",";
+        std::cout << item << ", ";
     }
-    std::cout << std::endl << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
+    
+    std::cout << std::endl << "Traditional Dynamic Programming Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    
+    weight.pop_front();
+    val.pop_front();
     
     return k[n][cap];
 }
 
-int knapsackMem(const int weight[], const int val[], const int& cap, const int& n)
+int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, const int& n)
 {
     float startTime = clock();
+    
+    weight.push_front(0);
+    val.push_front(0);
     
     int k = 23;
     hash table(k , n, cap);
@@ -300,16 +344,22 @@ int knapsackMem(const int weight[], const int val[], const int& cap, const int& 
         
     }
     
-    std::cout << "optimal set: ";
+    std::cout << "Space-efficient Dynamic Programming Optimal value: " << optimalVal << std::endl;
+    std::cout << "Space-efficient Dynamic Programming Optimal subset: ";
     for (auto item : optimalSet)
     {
-        std::cout << item << ",";
+        std::cout << item << ", ";
     }
-    std::cout << std::endl << "Time: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl;
+    
+    std::cout << std::endl << "Space-efficient Dynamic Programming Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    
+    weight.pop_front();
+    val.pop_front();
+    
     return optimalVal;
 }
 
-int knapsackMemHelper(const int weight[], const int val[], const int& cap, const int& n, hash& table)
+int knapsackMemHelper(std::deque<int>& weight, std::deque<int>& val, const int& cap, const int& n, hash& table)
 {
     int value;
     
@@ -353,10 +403,11 @@ int getInt(std::ifstream& stream)
 {
     std::string token;
     stream >> token;
+//    std::cout << "Token:" << token << std::endl;
     if (!isInt(token))
     {
         std::cerr << "File provided contains non-integer value. " << std::endl;
         return -1;
     }
-    return stoi(token);
+    return std::stoi(token);
 }

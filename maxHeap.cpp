@@ -6,14 +6,14 @@
 //  Copyright © 2019 supersaiyansubtlety. All rights reserved.
 //
 
-#include "heap.hpp"
+#include "maxHeap.hpp"
 
-heap::heap()
+maxHeap::maxHeap()
 {
     
 }
 
-heap::heap(int n, int weight[], int val[], int capacity)
+maxHeap::maxHeap(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 {
     //dummy-sentinel root node so index math works
     std::deque<node> not_heap = { node(FLT_MAX, 0, 0, 0) };
@@ -37,10 +37,10 @@ heap::heap(int n, int weight[], int val[], int capacity)
 //    heapify(data);
 //}
 
-void heap::heapify()
+void maxHeap::heapify()
 {
     //dummy-sentinel root node so index math works
-    data.push_back(node(INT_MAX, 0, 0, 0));
+//    data.push_back(node(INT_MAX, 0, 0, 0));
     
 //    int i = int(data.size())/2;
     
@@ -67,29 +67,29 @@ void heap::heapify()
     }
 }
 
-bool heap::insert()
+bool maxHeap::insert()
 {
     
     return false;
 }
 
 
-int heap::size()
+int maxHeap::size()
 {
     return int(data.size()) - 1;
 }
 
-bool heap::isEmpty()
+bool maxHeap::isEmpty()
 {
     return data.size() <= 1;
 }
 
-node heap::getMax()
+node maxHeap::getMax()
 {
     return data[1];
 }
 
-node heap::popMax()
+node maxHeap::popMax()
 {
     auto max = getMax();
     
@@ -101,7 +101,7 @@ node heap::popMax()
     return max;
 }
 
-void heap::print()
+void maxHeap::print()
 {
     if(!isEmpty())
     {
@@ -136,7 +136,7 @@ void heap::print()
 
 //private
 
-void heap::propogate(int parent)
+void maxHeap::propogate(int parent)
 {
     int L, R;
     setLR(parent, L, R);
@@ -154,7 +154,7 @@ void heap::propogate(int parent)
     }
 }
 
-void heap::setLR(const int& parent, int& L, int& R) const
+void maxHeap::setLR(const int& parent, int& L, int& R) const
 {
     L = parent * 2;
     if(L >= data.size()) { L = -1; R = -1; }
@@ -165,7 +165,7 @@ void heap::setLR(const int& parent, int& L, int& R) const
     }
 }
 
-bool heap::midLeafHandle(const int& parent, const int& L, const int& R)
+bool maxHeap::midLeafHandle(const int& parent, const int& L, const int& R)
 {
     if (L < 0) { return true; }
     if (R < 0)
