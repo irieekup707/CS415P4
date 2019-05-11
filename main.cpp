@@ -101,7 +101,12 @@ int main(int argc, const char * argv[])
                             }
                             while(isspace(valFile.peek())) { valFile.ignore(1); }
                         }
-                        if(n != vals.size()) { i--; }
+                        if(n != vals.size())
+                        {
+                            weights.clear();
+                            vals.clear();
+                            i--;
+                        }
                         else { i++; }
                         break;
                     default:
@@ -114,7 +119,7 @@ int main(int argc, const char * argv[])
         
         std::cout << std::endl << "Knapsack capacity = " << cap << ". Total number of items = " << n << std::endl << std::endl;
         
-//        knapsack(weights, vals, cap, n);
+        knapsack(weights, vals, cap, n);
         knapsackMem(weights, vals, cap, n);
         greedySortSack(weights, vals, cap, n);
         greedyHeapSack(weights, vals, cap, n);
@@ -290,7 +295,7 @@ int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 //    std::deque<std::pair<int, int> > optimalValues;
     std::deque<int> optimalSet;
 
-    while(j > 0)
+    while((j > 0) && (i > 0))
     {
         while(current == k[i-1][j])
         {
@@ -362,7 +367,7 @@ int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, c
     std::deque<std::pair<int, int> > optimalValues;
     std::deque<int> optimalSet;
     
-    while(j > 0)
+    while((j > 0) && (i > 0))
     {
         while(current == table.contains(i - 1, j))
         {
