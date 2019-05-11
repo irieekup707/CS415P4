@@ -15,14 +15,17 @@
 #include <string>
 #include "time.h"
 #include "hash.hpp"
-#include "maxHeap.hpp"
+#include "heap.hpp"
+
 void greedySortSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
 void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
 int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
 int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, const int& n);
 int knapsackMemHelper(std::deque<int>& weight, std::deque<int>& val, const int& cap, const int& n, hash& table);
+
 bool isInt(const std::string& str);
 int getInt(std::ifstream& stream);
+void endl(int n);
 
 int main(int argc, const char * argv[])
 {
@@ -123,8 +126,6 @@ int main(int argc, const char * argv[])
         knapsackMem(weights, vals, cap, n);
         greedySortSack(weights, vals, cap, n);
         greedyHeapSack(weights, vals, cap, n);
-
-
     }
     
     return 0;
@@ -135,84 +136,58 @@ void greedySortSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n
 {
     float startTime = clock();
     
-    std::deque<std::pair<std::pair<float, int>, std::pair<int, int>> > values;
-    std::deque<std::pair<std::pair<float, int>, std::pair<int, int>> > unsorted;
-    std::pair<float,int> weightValRatio;
-    std::pair<int,int> weightAndVal;
-    std::pair<std::pair<float,int>,std::pair<int,int>> weightValPair;
-    std::deque<int> optimalSet;
+    std::deque<node> values;
     for(int i = 0; i < n; i++)
     {
-        weightValRatio = std::make_pair(( val[i]/float(weight[i])), i + 1);
-        weightAndVal = std::make_pair(weight[i], val[i]);
-        weightValPair = std::make_pair(weightValRatio,weightAndVal);
-        values.push_back(weightValPair);
+        values.push_back(node(val[i]/float(weight[i]), weight[i], val[i], i + 1));
     }
   
-    unsorted = values;
-
-    sort (values.begin(), values.end(), std::greater<>());
-//    for(auto i =0; i < values.size(); i++)
-//    {
-//        std::cout << "val/weight is : " <<  values[i].first.first << "  item is : " << values[i].first.second << " Weight is " << values[i].second.first<< std::endl;
-//    }
-//
+    sort (values.begin(), values.end(), node::ratioGreater);
+    
+    std::deque<node> optimalSet;
+    
     int curCap = 0;
-//    if(values[1].second.first <= cap)
-//    {
-//        curCap = values[0].second.first;
-//        optimalSet.push_front(values[0].first.second);
-//    }
-//    std::cout << " curCap is : " << curCap << std::endl;
-    int it = 0;
-    while((curCap + values[it].second.first <= cap) && (it < n))
+    for(int it = 0; (it < n) && (curCap + values[it].getWeight() <= cap); it++)
     {
-//        if((curCap + values[it].second.first) <= cap)
-//        {
-            curCap += values[it].second.first;
-            optimalSet.push_back(values[it].first.second);
-//            std::cout << " curCap is : " << curCap << " Item is: " << values[it].first.second << " Val is: " << values[it].second.second << std::endl;
-//        }
-        it++;
-    }
-    int optVal = 0;
-    for (auto e : optimalSet)
-    {
-        optVal += unsorted[e - 1].second.second;
-    }
-    std::cout << "Greedy Approach Optimal value: " << optVal << std::endl;
-    std::cout << "Greedy Approach Optimal subset: ";
-
-    std::sort(optimalSet.begin(), optimalSet.end());
-    for (auto item : optimalSet)
-    {
-        std::cout << item << ", ";
+        curCap += values[it].getWeight();
+        optimalSet.push_back(values[it]);
     }
     
-    std::cout << std::endl << "Greedy Approach Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    int optVal = 0;
+    for(auto e : optimalSet)
+    {
+        optVal += e.getVal();
+    }
+    std::cout << "Greedy Approach Optimal value: " << optVal << std::endl;
+    std::cout << "Greedy Approach Optimal subset: {";
+
+    std::sort(optimalSet.begin(), optimalSet.end(), node::itemLess);
+    for(auto it = optimalSet.begin(); it < optimalSet.end() - 1; it++)
+    {
+        std::cout << it->getItem() << ", ";
+    }
+    std::cout << (optimalSet.end() - 1)->getItem() << "}";
+    endl(1);
+    std::cout << "Greedy Approach Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC;
+    endl(2);
 }
 
 void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
-{//ratio, weight, val, item
+{
     float startTime = clock();
     
-    maxHeap h(weight, val, cap, n);
+    heap h(weight, val, cap, n);
     
-    int it = 0, curCap = 0;
+    int curCap = 0;
     
     std::deque<node> optimalSet;
     
     node tempNode = h.popMax();
-    while((curCap + tempNode.getWeight() <= cap) && (it < n))
+    for(int it = 0; (it < n) && (curCap + tempNode.getWeight() <= cap); it++)
     {
-        //        if((curCap + values[it].second.first) <= cap)
-        //        {
         curCap += tempNode.getWeight();
         optimalSet.push_back(tempNode);
-        //            std::cout << " curCap is : " << curCap << " Item is: " << values[it].first.second << " Val is: " << values[it].second.second << std::endl;
-        //        }
         tempNode = h.popMax();
-        it++;
     }
     
     int optVal = 0;
@@ -222,21 +197,17 @@ void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n
     }
     
     std::cout << "Heap-based Greedy Approach Optimal value: " << optVal << std::endl;
-    std::cout << "Heap-based Greedy Approach Optimal subset: ";
-    std::deque<int> items;
-    for (auto e : optimalSet)
+    std::cout << "Heap-based Greedy Approach Optimal subset: {";
+
+    std::sort(optimalSet.begin(), optimalSet.end(), node::itemLess);
+    for(auto it = optimalSet.begin(); it < optimalSet.end() - 1; it++)
     {
-        items.push_back(e.getItem());
+        std::cout << it->getItem() << ", ";
     }
-    
-    std::sort(items.begin(), items.end());
-    
-    for (auto e : items)
-    {
-        std::cout << e << ", ";
-    }
-    
-    std::cout << std::endl << "Heap-based Greedy Approach Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    std::cout << (optimalSet.end() - 1)->getItem() << "}";
+    endl(1);
+    std::cout << "Heap-based Greedy Approach Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC;
+    endl(2);
     
 }
 
@@ -247,7 +218,7 @@ int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
     
     float startTime = clock();
     int i, j;
-//    int k[n+1][cap+1];
+
     std::vector<std::vector <int> > k;
     k.resize(n + 1);
     for(int i = 0; i < n + 1; i++)
@@ -256,15 +227,6 @@ int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
         temp.resize(cap + 1);
         k[i] = temp;
     }
-    
-    
-//    for (int a = 0; a <= n; a++)
-//    {
-//        for(int b = 0; b <= cap; b++)
-//        {
-//            k[a][b] = -1;
-//        }
-//    }
     
     for(j = 0; j <= cap; j++)
     {
@@ -278,7 +240,6 @@ int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
             {
                 auto first = k[i-1][j];
                 auto second = val[i] + k[i-1][j-weight[i]];
-//                std::cout << "val[i]" << val[i] << "[" << i << "]" << std::endl;
                 k[i][j] = std::max(first,second);
             }
             else
@@ -287,52 +248,34 @@ int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
         }
     }
     
-//    for (int a = 0; a <= n; a++)
-//    {
-//        for(int b = 0; b <= cap; b++)
-//        {
-//            std::cout << k[a][b] << ",";
-//        }
-//        std::cout << "\n";
-//    }
-//    std::cout << "---------------------" << std::endl;
-    
     j = cap;
     i = n;
-    
     int current = k[i][j];
 
-//    std::deque<std::pair<int, int> > optimalValues;
     std::deque<int> optimalSet;
 
-    while((j > 0) && (i > 0))
+    while((j > 0))
     {
-        while(current == k[i-1][j])
+        while((i > 1) && (current == k[i-1][j]))
         {
             i--;
         }
-//        optimalValues.push_front(std::make_pair(weight[i], val[i]));
         optimalSet.push_front(i);
         j -= weight[i];
         i--;
         current = k[i][j];
-        
     }
-    
-//    std::cout << "optimal vals: ";
-//    for (auto item : optimalValues)
-//    {
-//        std::cout << item.first << "," << item.second << ";";
-//    }
     
     std::cout << "Traditional Dynamic Programming Optimal value: " << k[n][cap] << std::endl;
-    std::cout << "Traditional Dynamic Programming Optimal subset: ";
-    for (auto item : optimalSet)
+    std::cout << "Traditional Dynamic Programming Optimal subset: {";
+    for(auto it = optimalSet.begin(); it < optimalSet.end() - 1; it++)
     {
-        std::cout << item << ", ";
+        std::cout << *it << ", ";
     }
-    
-    std::cout << std::endl << "Traditional Dynamic Programming Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    std::cout << *(optimalSet.end() - 1) << "}";
+    endl(1);
+    std::cout << "Traditional Dynamic Programming Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC;
+    endl(2);
     
     weight.pop_front();
     val.pop_front();
@@ -360,15 +303,6 @@ int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, c
     }
     
     auto optimalVal = knapsackMemHelper(weight, val, cap, n, table);
-//    for (int i = 0; i <= n; i++)
-//    {
-//        for(int j = 0; j <= cap; j++)
-//        {
-//            std::cout << table.contains(i, j) << ",";
-//        }
-//        std::cout << "\n";
-//    }
-//    std::cout << "---------------------" << std::endl;
     
     int i = n;
     int j = cap;
@@ -377,9 +311,9 @@ int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, c
     std::deque<std::pair<int, int> > optimalValues;
     std::deque<int> optimalSet;
     
-    while((j > 0) && (i > 0))
+    while(i > 0)
     {
-        while(current == table.contains(i - 1, j))
+        while((i > 1) && (current == table.contains(i - 1, j)))
         {
             i--;
         }
@@ -392,13 +326,15 @@ int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, c
     }
     
     std::cout << "Space-efficient Dynamic Programming Optimal value: " << optimalVal << std::endl;
-    std::cout << "Space-efficient Dynamic Programming Optimal subset: ";
-    for (auto item : optimalSet)
+    std::cout << "Space-efficient Dynamic Programming Optimal subset: {";
+    for(auto it = optimalSet.begin(); it < optimalSet.end() - 1; it++)
     {
-        std::cout << item << ", ";
+        std::cout << *it << ", ";
     }
-    
-    std::cout << std::endl << "Space-efficient Dynamic Programming Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    std::cout << *(optimalSet.end() - 1) << "}";
+    endl(1);
+    std::cout << "Space-efficient Dynamic Programming Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC;
+    endl(2);
     
     weight.pop_front();
     val.pop_front();
@@ -457,4 +393,12 @@ int getInt(std::ifstream& stream)
         return -1;
     }
     return std::stoi(token);
+}
+
+void endl(int n)
+{
+    for(int i = 0; i < n; i++)
+    {
+        std::cout << std::endl;
+    }
 }

@@ -61,47 +61,10 @@ int hash::h_func(int i, int j)
     return Rij % k;
 }
 
-//int hash::h_funcOLD(int i, int j)
-//{//ORIGINAL
-//    auto Bn   = getNumBits(n + 1);
-//    auto Bcap = getNumBits(cap + 1);
-//
-//    std::deque<bool> Ri = getBitRep(i);
-//    std::deque<bool> Rj = getBitRep(j);
-//
-//    while(Ri.size() < Bn) { Ri.push_front(0); }
-//    while(Rj.size() < Bcap) { Rj.push_front(0); }
-//
-//    auto Rij = Ri;
-//    Rij.insert(Rij.end(), Rj.begin(), Rj.end());
-//    Rij.push_front(1);
-//
-//    int iRij = 0;
-//
-//    for(auto bit : Rij)
-//    {
-//        iRij <<= 1;
-//        iRij |= bit;
-//    }
-//
-//    return iRij % k;
-//}
-
 int getNumBits(int num)
 {
     return ceil(log2(num+1));
 }
-
-//std::deque<bool> getBitRep(int num)
-//{
-//    std::deque<bool> bits;
-//    while(num)
-//    {
-//        bits.push_front(num & 1);
-//        num >>= 1;
-//    }
-//    return bits;
-//}
 
 template<typename T>
 void printDeque(std::deque<T> InDeque, std::string leadString)

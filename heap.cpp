@@ -6,14 +6,14 @@
 //  Copyright © 2019 supersaiyansubtlety. All rights reserved.
 //
 
-#include "maxHeap.hpp"
+#include "heap.hpp"
 
-maxHeap::maxHeap()
+heap::heap()
 {
     
 }
 
-maxHeap::maxHeap(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
+heap::heap(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 {
     //dummy-sentinel root node so index math works
     std::deque<node> not_heap = { node(FLT_MAX, 0, 0, 0) };
@@ -23,73 +23,43 @@ maxHeap::maxHeap(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
         float ratio = (weight[i])? val[i]/float(weight[i]) : 0;
         not_heap.push_back(node(ratio, weight[i], val[i], i + 1));
     }
-//    for (auto e : not_heap)
-//    {
-//        e.print(",");
-//    }
+
     data = not_heap;
     
     heapify();
 }
 
-//void heap::heapify()
-//{
-//    heapify(data);
-//}
-
-void maxHeap::heapify()
+void heap::heapify()
 {
-    //dummy-sentinel root node so index math works
-//    data.push_back(node(INT_MAX, 0, 0, 0));
-    
-//    int i = int(data.size())/2;
-    
-//    int L, R, greater;
-//    //this does the first iteration outside the loop, with checks for r == -1,
-//    //because in the loop we don't need to check
-//    setLR(i, L, R);
-//    if(R == -1) { greater = L; }
-//    else
-//    {
-//        greater = (data[L].ratio > data[R].ratio)? L : R;
-//    }
-//    //single promotion rather than full propogation because we're at bottom level
-//    if(data[greater].ratio > data[i].ratio)
-//    {
-//        std::swap(data[greater], data[i]);
-//    }
-//
-    //i-- before loop so we don't re-do the first iteration
     for(int i = int(data.size())/2; i >= 1 ; i--)
     {
-        //NOT using setLR because we don't need the check, R always < data.size()
         propogate(i);
     }
 }
 
-bool maxHeap::insert()
+bool heap::insert()
 {
     
     return false;
 }
 
 
-int maxHeap::size()
+int heap::size()
 {
     return int(data.size()) - 1;
 }
 
-bool maxHeap::isEmpty()
+bool heap::isEmpty()
 {
     return data.size() <= 1;
 }
 
-node maxHeap::getMax()
+node heap::getMax()
 {
     return data[1];
 }
 
-node maxHeap::popMax()
+node heap::popMax()
 {
     auto max = getMax();
     
@@ -101,7 +71,7 @@ node maxHeap::popMax()
     return max;
 }
 
-void maxHeap::print()
+void heap::print()
 {
     if(!isEmpty())
     {
@@ -136,7 +106,7 @@ void maxHeap::print()
 
 //private
 
-void maxHeap::propogate(int parent)
+void heap::propogate(int parent)
 {
     int L, R;
     setLR(parent, L, R);
@@ -154,7 +124,7 @@ void maxHeap::propogate(int parent)
     }
 }
 
-void maxHeap::setLR(const int& parent, int& L, int& R) const
+void heap::setLR(const int& parent, int& L, int& R) const
 {
     L = parent * 2;
     if(L >= data.size()) { L = -1; R = -1; }
@@ -165,7 +135,7 @@ void maxHeap::setLR(const int& parent, int& L, int& R) const
     }
 }
 
-bool maxHeap::midLeafHandle(const int& parent, const int& L, const int& R)
+bool heap::midLeafHandle(const int& parent, const int& L, const int& R)
 {
     if (L < 0) { return true; }
     if (R < 0)
@@ -221,5 +191,12 @@ int node::getItem() const
     return item;
 }
 
+bool node::ratioGreater(const node& a, const node& b)
+{
+    return a.ratio > b.ratio;
+}
 
-
+bool node::itemLess(const node& a, const node& b)
+{
+    return a.item < b.item;
+}

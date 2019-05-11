@@ -49,7 +49,6 @@ public:
     heap(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
     
     void heapify();
-//    void heapify(std::deque<node>& in_data);
     bool insert();
     
     int size();
@@ -63,14 +62,11 @@ public:
 private:
     std::deque<node> data;
     
-//    void swap(int i, int j);
     void propogate(int parent);
     
     void setLR(const int& parent, int& L, int& R) const;
     
     bool midLeafHandle(const int& parent, const int& L, const int& R);
 };
-
-
 
 #endif /* heap_hpp */
