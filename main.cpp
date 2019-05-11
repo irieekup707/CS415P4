@@ -27,9 +27,23 @@ bool isInt(const std::string& str);
 int getInt(std::ifstream& stream);
 void endl(int n);
 
+
+/* USER ENTRY */
+auto& inStream = std::cin;
+bool automatic = false;
+void openStream() {}
+bool whileCheck() { return true; }
+
+/* AUTOMATIC ENTRY */
+//std::ifstream inStream;
+//void openStream() { inStream.open("input.txt"); }
+//bool automatic = true;
+//bool whileCheck() { return inStream.peek() != EOF; }
+
 int main(int argc, const char * argv[])
 {
-    while (true)
+    openStream();
+    while (whileCheck())
     {
         //Get three files. Keep asking until valid path is specified for each.
         std::string input = "";
@@ -61,10 +75,18 @@ int main(int argc, const char * argv[])
                     break;
             }
             std::cout << "Enter file containing the " << specifier << ": ";
-            getline(std::cin, input);
+            getline(inStream, input);
+            
+            if(automatic)
+            {
+                std::cout << input;
+                endl(1);
+            }
+            
             file->open(input);
             if(!file->is_open())
             {
+                if(automatic) { return 0; }
                 std::cout << "Invalid file path specified. ";
             }
             else
@@ -254,15 +276,17 @@ int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 
     std::deque<int> optimalSet;
 
-    while((j > 0))
+    while((j > 0) && (i > 1))
     {
         while((i > 1) && (current == k[i-1][j]))
         {
             i--;
         }
+        assert(i > 0);
         optimalSet.push_front(i);
         j -= weight[i];
         i--;
+        assert(i > -1);
         current = k[i][j];
     }
     
@@ -311,7 +335,7 @@ int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, c
     std::deque<std::pair<int, int> > optimalValues;
     std::deque<int> optimalSet;
     
-    while(i > 0)
+    while((j > 0) && (i > 1))
     {
         while((i > 1) && (current == table.contains(i - 1, j)))
         {
@@ -386,7 +410,7 @@ int getInt(std::ifstream& stream)
 {
     std::string token;
     stream >> token;
-//    std::cout << "Token:" << token << std::endl;
+    
     if (!isInt(token))
     {
         std::cerr << "File provided contains non-integer value. " << std::endl;
