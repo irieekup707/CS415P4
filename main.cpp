@@ -242,11 +242,21 @@ void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n
 
 int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 {
-    float startTime = clock();
-    int i, j;
-    int k[n+1][cap+1];
     weight.push_front(0);
     val.push_front(0);
+    
+    float startTime = clock();
+    int i, j;
+//    int k[n+1][cap+1];
+    std::vector<std::vector <int> > k;
+    k.resize(n + 1);
+    for(int i = 0; i < n + 1; i++)
+    {
+        std::vector<int> temp;
+        temp.resize(cap + 1);
+        k[i] = temp;
+    }
+    
     
 //    for (int a = 0; a <= n; a++)
 //    {
