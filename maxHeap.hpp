@@ -18,7 +18,14 @@
 
 class node
 {
+public:
     node(float ratio, int weight, int val, int item);
+    
+    float getRatio() const;
+    int getWeight() const;
+    int getVal() const;
+    int getItem() const;
+    
 private:
     friend class maxHeap;
     
@@ -26,7 +33,7 @@ private:
     int weight;
     int val;
     int item;
-    
+        
     void print(std::string delim, int endl = 1);
     void print(std::string delim, std::string end);
     

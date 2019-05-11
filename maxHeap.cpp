@@ -21,7 +21,7 @@ maxHeap::maxHeap(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
     for (int i = 0; i < n; i++)
     {
         float ratio = (weight[i])? val[i]/float(weight[i]) : 0;
-        not_heap.push_back(node(ratio, weight[i], val[i], i));
+        not_heap.push_back(node(ratio, weight[i], val[i], i + 1));
     }
 //    for (auto e : not_heap)
 //    {
@@ -200,5 +200,26 @@ void node::print(std::string delim, std::string end)
 {
     std::cout << ratio << delim << weight << delim << val << delim << item << end;
 }
+
+float node::getRatio() const
+{
+    return ratio;
+}
+
+int node::getWeight() const
+{
+    return weight;
+}
+
+int node::getVal() const
+{
+    return val;
+}
+
+int node::getItem() const
+{
+    return item;
+}
+
 
 

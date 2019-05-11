@@ -46,13 +46,13 @@ void hash::printTable()
 
 int hash::h_func(int i, int j)
 {
-    auto Bn   = getNumBits(n + 1);
-    auto Bcap = getNumBits(cap + 1);
+    unsigned long long Bn   = getNumBits(n + 1);
+    unsigned long long Bcap = getNumBits(cap + 1);
     
-    auto Ri   = getNumBits(i);
-    auto Rj = getNumBits(j);
+    unsigned long long Ri   = getNumBits(i);
+    unsigned long long Rj = getNumBits(j);
     
-    int Rij = 1;
+    unsigned long long Rij = 1;
     Rij <<= Bn;
     Rij += Ri;
     Rij <<= Bcap;

@@ -114,9 +114,11 @@ int main(int argc, const char * argv[])
         
         std::cout << std::endl << "Knapsack capacity = " << cap << ". Total number of items = " << n << std::endl << std::endl;
         
-        knapsack(weights, vals, cap, n);
+//        knapsack(weights, vals, cap, n);
         knapsackMem(weights, vals, cap, n);
         greedySortSack(weights, vals, cap, n);
+        greedyHeapSack(weights, vals, cap, n);
+
 
     }
     
@@ -175,6 +177,8 @@ void greedySortSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n
     }
     std::cout << "Greedy Approach Optimal value: " << optVal << std::endl;
     std::cout << "Greedy Approach Optimal subset: ";
+
+    std::sort(optimalSet.begin(), optimalSet.end());
     for (auto item : optimalSet)
     {
         std::cout << item << ", ";
@@ -185,22 +189,50 @@ void greedySortSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n
 
 void greedyHeapSack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
 {//ratio, weight, val, item
-    maxHeap h(std::deque<int>& weight, std::deque<int>& val,int cap, int n);
-
+    float startTime = clock();
+    
+    maxHeap h(weight, val, cap, n);
+    
     int it = 0, curCap = 0;
     
+    std::deque<node> optimalSet;
     
-    node tempNode = (h.popMax());
-    while((curCap + tempNode. <= cap) && (it < n))
+    node tempNode = h.popMax();
+    while((curCap + tempNode.getWeight() <= cap) && (it < n))
     {
         //        if((curCap + values[it].second.first) <= cap)
         //        {
-        curCap += values[it].second.first;
-        optimalSet.push_back(values[it].first.second);
+        curCap += tempNode.getWeight();
+        optimalSet.push_back(tempNode);
         //            std::cout << " curCap is : " << curCap << " Item is: " << values[it].first.second << " Val is: " << values[it].second.second << std::endl;
         //        }
+        tempNode = h.popMax();
         it++;
     }
+    
+    int optVal = 0;
+    for(auto e : optimalSet)
+    {
+        optVal += e.getVal();
+    }
+    
+    std::cout << "Heap-based Greedy Approach Optimal value: " << optVal << std::endl;
+    std::cout << "Heap-based Greedy Approach Optimal subset: ";
+    std::deque<int> items;
+    for (auto e : optimalSet)
+    {
+        items.push_back(e.getItem());
+    }
+    
+    std::sort(items.begin(), items.end());
+    
+    for (auto e : items)
+    {
+        std::cout << e << ", ";
+    }
+    
+    std::cout << std::endl << "Heap-based Greedy Approach Time Taken: " << (clock() - startTime)/CLOCKS_PER_SEC << std::endl << std::endl;
+    
 }
 
 int knapsack(std::deque<int>& weight, std::deque<int>& val,int cap, int n)
@@ -300,7 +332,7 @@ int knapsackMem(std::deque<int>& weight, std::deque<int>& val, const int& cap, c
     weight.push_front(0);
     val.push_front(0);
     
-    int k = 23;
+    int k = 2 * cap;
     hash table(k , n, cap);
     for (int i = 0; i <= n; i++)
     {
@@ -375,10 +407,10 @@ int knapsackMemHelper(std::deque<int>& weight, std::deque<int>& val, const int& 
         }
         else
         {
-            auto first = table.contains(i - 1, j);
+            int first = table.contains(i - 1, j);
             if (first == -1) { first = knapsackMemHelper(weight, val, j, i - 1, table); }
             
-            auto second = table.contains(i - 1,  j - weight[i]);
+            int second = table.contains(i - 1,  j - weight[i]);
             if (second == -1) { second = knapsackMemHelper(weight, val, j - weight[i], i - 1, table); }
             
             value = std::max(first, val[i] + second);
